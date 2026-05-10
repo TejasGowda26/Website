@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tejas V Gowda — EEE Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --aqua: #00d4f0;
+      --aqua2: #00b8d9;
+      --cyan: #00e5ff;
+      --mint: #00e5c8;
+      --teal-glass: rgba(0, 180, 220, 0.14);
+      --teal-glass-b: rgba(80, 220, 255, 0.42);
+      --sidebar-w: 272px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+      background: #004a6b;
+    }
+
+    .bg-wrap { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+
+    .bg-grad {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 5%,  rgba(0,200,255,0.22) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 85% 90%, rgba(0,120,200,0.28) 0%, transparent 60%),
+        linear-gradient(165deg, #005a78 0%, #006f88 18%, #004d70 40%, #003858 65%, #002d4a 100%);
+      animation: bgB 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes bgB {
+      0%   { filter: hue-rotate(0deg) brightness(1); }
+      50%  { filter: hue-rotate(12deg) brightness(1.06); }
+      100% { filter: hue-rotate(-8deg) brightness(0.96); }
+    }
+
+    .aurora {
+      position: absolute; top: 0; left: 0; right: 0; height: 340px;
+      background: linear-gradient(180deg, rgba(0,228,255,0.18) 0%, rgba(0,190,220,0.1) 40%, transparent 100%);
+      animation: auroP 10s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes auroP { from { opacity: 0.6; } to { opacity: 1; } }
+
+    .bk {
+      position: absolute; border-radius: 50%; opacity: 0;
+      animation: bkF linear infinite;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.85) 0%, rgba(0,220,255,0.55) 30%, rgba(0,160,220,0.18) 65%, transparent 85%);
+    }
+
+    @keyframes bkF {
+      0%   { transform: translateY(105vh) scale(0.6); opacity: 0; }
+      8%   { opacity: 0.6; }
+      92%  { opacity: 0.4; }
+      100% { transform: translateY(-8vh) scale(1.1); opacity: 0; }
+    }
+
+    .bk:nth-child(1)  { width:70px;  height:70px;  left:7%;  animation-duration:16s; animation-delay:0s; }
+    .bk:nth-child(2)  { width:42px;  height:42px;  left:21%; animation-duration:20s; animation-delay:3s; }
+    .bk:nth-child(3)  { width:100px; height:100px; left:38%; animation-duration:25s; animation-delay:6s; }
+    .bk:nth-child(4)  { width:34px;  height:34px;  left:57%; animation-duration:13s; animation-delay:1.5s; }
+    .bk:nth-child(5)  { width:80px;  height:80px;  left:72%; animation-duration:18s; animation-delay:4s; }
+    .bk:nth-child(6)  { width:54px;  height:54px;  left:88%; animation-duration:22s; animation-delay:8s; }
+    .bk:nth-child(7)  { width:28px;  height:28px;  left:50%; animation-duration:12s; animation-delay:10s; }
+    .bk:nth-child(8)  { width:88px;  height:88px;  left:16%; animation-duration:28s; animation-delay:7s; }
+    .bk:nth-child(9)  { width:46px;  height:46px;  left:64%; animation-duration:17s; animation-delay:11s; }
+    .bk:nth-child(10) { width:62px;  height:62px;  left:93%; animation-duration:23s; animation-delay:5s; }
+
+    .ray {
+      position: absolute; top: -5%; width: 2.5px; height: 55vh;
+      background: linear-gradient(180deg, rgba(0,230,255,0.55) 0%, transparent 100%);
+      transform-origin: top;
+      animation: rayG 9s ease-in-out infinite alternate;
+    }
+    .ray:nth-child(1) { left:14%; transform:rotate(-20deg); animation-delay:0s; }
+    .ray:nth-child(2) { left:44%; transform:rotate(4deg);   opacity:0.5; animation-delay:3s; }
+    .ray:nth-child(3) { left:79%; transform:rotate(18deg);  opacity:0.7; animation-delay:6s; }
+    @keyframes rayG { from { opacity: 0.3; } to { opacity: 0.85; } }
+
+    /* Glass */
+    .glass {
+      background: rgba(0, 180, 220, 0.14);
+      backdrop-filter: blur(22px) saturate(140%);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      border: 1.5px solid rgba(80, 220, 255, 0.42);
+      border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1.5px 0 rgba(255,255,255,0.28), 0 0 0 1px rgba(0,180,220,0.1);
+      position: relative;
+    }
+
+    .glass::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%; border-radius:20px 20px 0 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+      pointer-events:none;
+    }
+
+    /* Layout */
+    .layout { position: relative; z-index: 10; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    aside {
+      width: var(--sidebar-w); min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100;
+      display: flex; flex-direction: column; padding: 24px 18px; gap: 16px;
+      background: rgba(0, 100, 140, 0.3);
+      backdrop-filter: blur(30px) saturate(160%);
+      -webkit-backdrop-filter: blur(30px) saturate(160%);
+      border-right: 1.5px solid rgba(100, 220, 255, 0.3);
+      box-shadow: 4px 0 40px rgba(0,0,0,0.35), inset -1px 0 0 rgba(255,255,255,0.06);
+    }
+
+    .sb-logo {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: 14px; background: rgba(0,200,255,0.1);
+      border: 1px solid rgba(0,210,255,0.3);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    .logo-spark {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: linear-gradient(135deg, #00d4f0, #00b8d9, #00e5c8);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      box-shadow: 0 3px 12px rgba(0,210,240,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+    }
+
+    .logo-text { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.95); }
+
+    .sb-profile { padding: 22px 18px; text-align: center; }
+
+    .avatar-hex {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,210,240,0.3), rgba(0,160,200,0.2));
+      border: 2.5px solid rgba(0,220,255,0.6);
+      box-shadow: 0 0 0 5px rgba(0,200,240,0.12), 0 6px 24px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.25);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 28px; font-weight: 900; color: var(--cyan); letter-spacing: -1px;
+      position: relative;
+    }
+
+    .avatar-hex::after {
+      content:''; position:absolute; inset:-7px; border-radius:50%;
+      border: 1.5px dashed rgba(0,210,255,0.28);
+      animation: avSpin 16s linear infinite;
+    }
+
+    @keyframes avSpin { to { transform: rotate(360deg); } }
+
+    .sb-name { font-size: 18px; font-weight: 900; color: #fff; line-height: 1.2; }
+    .sb-role { font-size: 11px; color: rgba(0,220,255,0.85); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 5px; }
+
+    .sb-badges { display: flex; flex-direction: column; gap: 7px; margin-top: 14px; }
+
+    .sb-badge {
+      display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+      border-radius: 10px; background: rgba(0,180,220,0.12); border: 1px solid rgba(0,210,255,0.25);
+      font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.8);
+    }
+
+    .sb-badge b { color: var(--aqua); font-weight: 700; }
+
+    .sb-nav { display: flex; flex-direction: column; gap: 4px; }
+
+    .sb-nav-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(0,210,255,0.55); padding: 0 12px; margin-bottom: 4px;
+    }
+
+    .sb-link {
+      display: flex; align-items: center; gap: 11px; padding: 11px 16px; border-radius: 14px;
+      background: transparent; border: 1.5px solid transparent;
+      color: rgba(255,255,255,0.72); text-decoration: none;
+      font-size: 14px; font-weight: 700; transition: all 0.22s ease; position: relative; overflow: hidden;
+    }
+
+    .sb-link::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:50%;
+      background: rgba(255,255,255,0.06); border-radius:14px 14px 0 0;
+      opacity:0; transition:opacity 0.2s;
+    }
+
+    .sb-link:hover, .sb-link.active {
+      background: rgba(0,200,240,0.18); border-color: rgba(0,210,255,0.45);
+      color: #fff; box-shadow: 0 3px 16px rgba(0,0,0,0.25), inset 0 1.5px 0 rgba(255,255,255,0.18);
+    }
+
+    .sb-link:hover::before, .sb-link.active::before { opacity: 1; }
+    .sb-link.active { color: var(--cyan); }
+
+    .nav-ico {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: rgba(0,180,220,0.2); border: 1px solid rgba(0,210,255,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    .sb-footer {
+      margin-top: auto; padding: 14px 12px; border-radius: 14px;
+      background: rgba(0,150,190,0.12); border: 1px solid rgba(0,200,240,0.22);
+      font-size: 11px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.6;
+    }
+
+    /* Main */
+    main { margin-left: var(--sidebar-w); flex: 1; padding: 0 44px 80px; }
+
+    /* Hero */
+    #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 40px; }
+
+    .hero-inner { display: flex; flex-direction: column; gap: 26px; max-width: 800px; }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px; padding: 9px 22px; border-radius: 40px;
+      background: rgba(0,200,240,0.14); border: 1.5px solid rgba(0,220,255,0.45);
+      font-size: 12px; font-weight: 800; color: var(--cyan); letter-spacing: 0.06em; text-transform: uppercase;
+      box-shadow: 0 3px 16px rgba(0,0,0,0.25), 0 0 20px rgba(0,200,255,0.1);
+      width: fit-content; animation: fdUp 0.6s ease both;
+    }
+
+    .pulse {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan), var(--mint));
+      box-shadow: 0 0 0 3px rgba(0,229,255,0.22);
+      animation: pls 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pls {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(0,229,255,0.22); }
+      50%       { box-shadow: 0 0 0 7px rgba(0,229,255,0.08); transform: scale(1.25); }
+    }
+
+    .hero-name {
+      font-size: clamp(56px, 8.5vw, 108px); font-weight: 900; line-height: 0.97;
+      background: linear-gradient(145deg, #ffffff 0%, #b0eeff 25%, #00d4f0 50%, #00e5c8 75%, #c0f4ff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      filter: drop-shadow(0 4px 20px rgba(0,200,255,0.4));
+      animation: fdUp 0.65s 0.08s ease both; letter-spacing: -0.02em;
+    }
+
+    .hero-sub {
+      font-size: clamp(14px, 1.8vw, 18px); color: rgba(0,220,255,0.85); font-weight: 700;
+      letter-spacing: 0.02em; animation: fdUp 0.65s 0.16s ease both;
+    }
+
+    .hero-card { padding: 36px 44px; animation: fdUp 0.65s 0.24s ease both; }
+
+    .hero-card p { font-size: 16px; line-height: 1.78; color: rgba(255,255,255,0.88); }
+
+    .ctas { margin-top: 28px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .btn-glow {
+      position: relative; padding: 13px 30px; border-radius: 40px;
+      background: linear-gradient(180deg, #00d4f0 0%, #00a8c8 45%, #008fb0 100%);
+      color: #003344; font-weight: 900; font-size: 14.5px; text-decoration: none;
+      border: 1.5px solid rgba(0,220,255,0.8); cursor: pointer;
+      font-family: 'Nunito', sans-serif; overflow: hidden;
+      box-shadow: 0 5px 22px rgba(0,180,220,0.55), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -2px 0 rgba(0,80,120,0.4);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .btn-glow::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:53%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.05) 100%);
+      border-radius: 40px 40px 60% 60%;
+    }
+
+    .btn-glow:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,200,240,0.65); }
+
+    .btn-ghost {
+      padding: 13px 30px; border-radius: 40px; background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.92); font-weight: 800; font-size: 14.5px; text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25), inset 0 1.5px 0 rgba(255,255,255,0.15);
+      transition: all 0.22s ease;
+    }
+
+    .btn-ghost:hover { background: rgba(255,255,255,0.16); border-color: rgba(0,210,255,0.5); transform: translateY(-3px); color: var(--cyan); }
+
+    /* Sections */
+    section { padding: 80px 0; }
+
+    .sec-head { margin-bottom: 52px; }
+
+    .sec-label { font-size: 11px; font-weight: 900; letter-spacing: 0.22em; text-transform: uppercase; color: var(--aqua); opacity: 0.8; margin-bottom: 10px; display: block; }
+
+    .sec-title {
+      font-size: clamp(36px, 5vw, 56px); font-weight: 900;
+      background: linear-gradient(135deg, #fff 0%, #b0eeff 50%, #00d4f0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1.1;
+    }
+
+    .sec-line { width: 60px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--aqua), var(--mint)); margin-top: 14px; box-shadow: 0 0 10px rgba(0,212,240,0.6); }
+
+    /* About */
+    .about-grid { display: grid; grid-template-columns: 1fr 1.8fr; gap: 28px; align-items: start; }
+    @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
+
+    .about-card-l { padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+
+    .about-ico {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(0,210,255,0.28), rgba(0,160,200,0.18));
+      border: 2.5px solid rgba(0,220,255,0.55);
+      box-shadow: 0 0 0 6px rgba(0,200,240,0.1), 0 8px 28px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.22);
+      display: flex; align-items: center; justify-content: center; font-size: 36px;
+    }
+
+    .abt-name { font-size: 19px; font-weight: 900; color: #fff; }
+    .abt-uni  { font-size: 12px; font-weight: 700; color: rgba(0,210,255,0.8); letter-spacing: 0.04em; }
+
+    .info-rows { display: flex; flex-direction: column; gap: 7px; width: 100%; margin-top: 6px; }
+
+    .ir {
+      display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 10px;
+      background: rgba(0,180,220,0.12); border: 1px solid rgba(0,200,240,0.25);
+      font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.82);
+    }
+
+    .about-card-r { padding: 38px 42px; }
+    .about-card-r p { font-size: 15.5px; line-height: 1.78; color: rgba(255,255,255,0.86); margin-bottom: 16px; }
+    .about-card-r p:last-of-type { margin-bottom: 0; }
+
+    .int-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+
+    .int-tag {
+      padding: 7px 18px; border-radius: 30px; background: rgba(0,180,220,0.15);
+      border: 1.5px solid rgba(0,210,255,0.38); font-size: 13px; font-weight: 700;
+      color: rgba(255,255,255,0.88); box-shadow: 0 2px 10px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    /* Skills */
+    #skills { padding: 60px 0 80px; }
+
+    .skill-row { display: flex; flex-direction: column; gap: 20px; }
+
+    .skill-panel { padding: 26px 34px; }
+
+    .sp-title { font-size: 10.5px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: var(--aqua); margin-bottom: 18px; opacity: 0.85; }
+
+    .skill-pills { display: flex; flex-wrap: wrap; gap: 11px; }
+
+    .sk-pill {
+      position: relative; padding: 10px 22px; border-radius: 40px;
+      background: rgba(0,160,200,0.18); border: 1.5px solid rgba(0,210,255,0.42);
+      font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.92);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25), inset 0 1.5px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,100,150,0.3);
+      transition: all 0.22s ease; overflow: hidden; cursor: default;
+    }
+
+    .sk-pill::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:52%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+      border-radius: 40px 40px 0 0;
+    }
+
+    .sk-pill:hover {
+      background: rgba(0,200,240,0.28); border-color: rgba(0,229,255,0.65);
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 8px 22px rgba(0,180,220,0.38), inset 0 1.5px 0 rgba(255,255,255,0.28);
+      color: var(--cyan);
+    }
+
+    /* Projects */
+    .proj-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+
+    .proj-card { padding: 30px; transition: transform 0.28s ease, box-shadow 0.28s ease; }
+
+    .proj-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1.5px 0 rgba(255,255,255,0.28), 0 0 30px rgba(0,180,220,0.18);
+    }
+
+    .proj-ico-w {
+      width: 50px; height: 50px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(0,200,240,0.28), rgba(0,160,200,0.15));
+      border: 1.5px solid rgba(0,210,255,0.45);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28), inset 0 1.5px 0 rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 18px;
+    }
+
+    .proj-title { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 10px; line-height: 1.3; }
+
+    .proj-desc { font-size: 13.5px; line-height: 1.68; color: rgba(255,255,255,0.72); margin-bottom: 18px; }
+
+    .proj-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+
+    .pt {
+      font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; padding: 4px 12px; border-radius: 20px;
+      background: rgba(0,180,220,0.18); border: 1px solid rgba(0,210,255,0.38); color: rgba(0,220,255,0.9);
+    }
+
+    .proj-link {
+      display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 800;
+      color: var(--aqua); text-decoration: none; letter-spacing: 0.02em; transition: gap 0.2s, color 0.2s;
+    }
+
+    .proj-link:hover { gap: 10px; color: var(--cyan); }
+
+    .patent-badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px;
+      background: rgba(255,200,0,0.15); border: 1px solid rgba(255,200,0,0.4);
+      font-size: 10.5px; font-weight: 800; color: rgba(255,220,80,0.9); letter-spacing: 0.04em; margin-bottom: 10px;
+    }
+
+    /* Certs */
+    .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+    .cert-card { padding: 22px 24px; display: flex; gap: 14px; align-items: flex-start; }
+
+    .cert-ico {
+      width: 44px; height: 44px; border-radius: 12px; background: rgba(0,200,240,0.2);
+      border: 1.5px solid rgba(0,210,255,0.4);
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    .cert-name { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 5px; }
+    .cert-from { font-size: 12px; font-weight: 600; color: rgba(0,210,255,0.75); }
+
+    /* Contact */
+    .contact-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+
+    .contact-fc { padding: 42px; }
+    .contact-fc > p { font-size: 15.5px; line-height: 1.75; color: rgba(255,255,255,0.84); margin-bottom: 28px; }
+
+    .cform { display: flex; flex-direction: column; gap: 18px; }
+
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 580px) { .frow { grid-template-columns: 1fr; } }
+
+    .fg { display: flex; flex-direction: column; gap: 7px; }
+
+    .fg label { font-size: 11px; font-weight: 900; color: rgba(0,210,255,0.8); letter-spacing: 0.12em; text-transform: uppercase; }
+
+    .fg input, .fg textarea {
+      padding: 12px 16px; border-radius: 13px; background: rgba(0,150,190,0.18);
+      border: 1.5px solid rgba(0,200,240,0.35); font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 600; color: #fff; outline: none;
+      transition: all 0.2s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.08);
+      resize: none;
+    }
+
+    .fg input:focus, .fg textarea:focus { border-color: rgba(0,220,255,0.65); background: rgba(0,160,200,0.24); box-shadow: 0 0 0 3.5px rgba(0,200,240,0.15); }
+    .fg input::placeholder, .fg textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+    .contact-ic { padding: 28px 26px; display: flex; flex-direction: column; gap: 22px; }
+
+    .ci-title { font-size: 11px; font-weight: 900; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(0,200,240,0.7); margin-bottom: 12px; }
+
+    .ci-items { display: flex; flex-direction: column; gap: 9px; }
+
+    .ci-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 12px;
+      background: rgba(0,160,200,0.14); border: 1px solid rgba(0,200,240,0.28);
+      font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.85); text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .ci-item:hover { background: rgba(0,190,230,0.22); border-color: rgba(0,210,255,0.48); color: var(--cyan); transform: translateX(4px); }
+
+    .ci-ico {
+      width: 32px; height: 32px; border-radius: 9px; background: rgba(0,180,220,0.22);
+      border: 1px solid rgba(0,210,255,0.35); display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+
+    /* Reveal */
+    .rv { opacity: 0; transform: translateY(38px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .rv.on { opacity: 1; transform: translateY(0); }
+
+    @keyframes fdUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: rgba(0,60,90,0.4); }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--aqua), #008fb0); border-radius: 10px; }
+
+    /* Mobile */
+    .hamburger {
+      display: none; position: fixed; top: 16px; left: 16px; z-index: 200;
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(0,160,200,0.3); border: 1.5px solid rgba(0,210,255,0.4);
+      align-items: center; justify-content: center; cursor: pointer;
+      font-size: 20px; color: var(--cyan);
+    }
+
+    @media (max-width: 900px) {
+      aside { transform: translateX(-100%); transition: transform 0.3s ease; }
+      aside.open { transform: translateX(0); }
+      main { margin-left: 0; padding: 0 20px 60px; }
+      .hamburger { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-wrap" aria-hidden="true">
+    <div class="bg-grad"></div>
+    <div class="aurora"></div>
+    <div class="bk"></div><div class="bk"></div><div class="bk"></div>
+    <div class="bk"></div><div class="bk"></div><div class="bk"></div>
+    <div class="bk"></div><div class="bk"></div><div class="bk"></div><div class="bk"></div>
+    <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+  </div>
+
+  <button class="hamburger" id="menuBtn" aria-label="Toggle menu">☰</button>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <div class="sb-logo">
+        <div class="logo-spark">⚡</div>
+        <div class="logo-text">TVG Portfolio</div>
+      </div>
+
+      <div class="sb-profile glass">
+        <div class="avatar-hex">TVG</div>
+        <div class="sb-name">Tejas V Gowda</div>
+        <div class="sb-role">EEE · Christ University</div>
+        <div class="sb-badges">
+          <div class="sb-badge">📍 <b>Bengaluru, Karnataka</b></div>
+          <div class="sb-badge">🎓 <b>B.Tech EEE · 2027</b></div>
+          <div class="sb-badge">📞 <b>+91 8310544316</b></div>
+          <div class="sb-badge">🏛️ <b>Patent Filed</b></div>
+        </div>
+      </div>
+
+      <nav class="sb-nav" aria-label="Portfolio navigation">
+        <div class="sb-nav-label">Navigate</div>
+        <a href="#hero"     class="sb-link active"><span class="nav-ico">🏠</span> Home</a>
+        <a href="#about"    class="sb-link"><span class="nav-ico">👤</span> About</a>
+        <a href="#skills"   class="sb-link"><span class="nav-ico">🔧</span> Skills</a>
+        <a href="#projects" class="sb-link"><span class="nav-ico">🔬</span> Projects</a>
+        <a href="#certs"    class="sb-link"><span class="nav-ico">🏅</span> Certifications</a>
+        <a href="#contact"  class="sb-link"><span class="nav-ico">✉️</span> Contact</a>
+      </nav>
+
+      <div class="sb-footer">
+        Christ (Deemed to be) University<br>Bengaluru · B.Tech EEE · 2023–2027
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main>
+
+      <!-- HERO -->
+      <section id="hero">
+        <div class="hero-inner">
+          <div class="hero-tag">
+            <span class="pulse" aria-hidden="true"></span>
+            Open to Internships · EEE 4th Year
+          </div>
+          <h1 class="hero-name">Tejas<br>V Gowda</h1>
+          <p class="hero-sub">Electrical &amp; Electronics Engineering &nbsp;·&nbsp; Powertrain &nbsp;·&nbsp; MATLAB &amp; Simulink &nbsp;·&nbsp; CAN Security</p>
+          <div class="hero-card glass">
+            <p>EEE student at Christ University with hands-on experience in powertrain design, MATLAB/Simulink modelling, and automotive CAN bus security. Passionate about bridging hardware integration and secure software solutions to solve real-world engineering challenges.</p>
+            <div class="ctas">
+              <a href="#projects" class="btn-glow">View Projects</a>
+              <a href="#contact"  class="btn-ghost">Get in Touch</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about">
+        <div class="sec-head rv">
+          <span class="sec-label">Who I Am</span>
+          <h2 class="sec-title">About Me</h2>
+          <div class="sec-line"></div>
+        </div>
+        <div class="about-grid">
+          <div class="about-card-l glass rv">
+            <div class="about-ico">⚡</div>
+            <div class="abt-name">Tejas V Gowda</div>
+            <div class="abt-uni">Christ (Deemed to be) University</div>
+            <div class="info-rows">
+              <div class="ir">📍 Bengaluru, Karnataka</div>
+              <div class="ir">🎓 B.Tech EEE · Completing 2027</div>
+              <div class="ir">📞 +91 8310544316</div>
+              <div class="ir">🏫 Sheshadripuram PU College · 2022–23</div>
+              <div class="ir">🏫 Holy Angels High School · 2020</div>
+              <div class="ir">🏛️ Design Patent Filed</div>
+            </div>
+          </div>
+          <div class="about-card-r glass rv">
+            <p>I'm an Electrical and Electronics Engineering student at Christ University with hands-on experience in powertrain design, MATLAB/Simulink modelling, and CAN bus security. I've built simulations for 10-Stage Marx Generators, AM/PM communication systems, and automotive cybersecurity tools.</p>
+            <p>From wiring BLDC motor power circuits and DC-DC converters to developing Python-based CAN frame analysis tools with AES-128 encryption — I thrive where hardware meets software. I've also co-invented a patented waste-sorting system design currently under processing.</p>
+            <p>I'm actively looking for internship opportunities in power electronics, embedded systems, or automotive engineering where I can contribute and keep growing as an engineer.</p>
+            <div class="int-list">
+              <span class="int-tag">⚡ Powertrain Design</span>
+              <span class="int-tag">📡 MATLAB / Simulink</span>
+              <span class="int-tag">🔒 CAN Bus Security</span>
+              <span class="int-tag">🤖 Embedded Systems</span>
+              <span class="int-tag">🔬 Signal Processing</span>
+              <span class="int-tag">📋 Design Patent</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS -->
+      <section id="skills">
+        <div class="sec-head rv">
+          <span class="sec-label">What I Know</span>
+          <h2 class="sec-title">Skills</h2>
+          <div class="sec-line"></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-panel glass rv">
+            <div class="sp-title">Engineering Software &amp; Design</div>
+            <div class="skill-pills">
+              <span class="sk-pill">MATLAB / Simulink</span>
+              <span class="sk-pill">E-Plan</span>
+              <span class="sk-pill">AutoCAD</span>
+              <span class="sk-pill">Blender 3D Modelling</span>
+              <span class="sk-pill">CodeSys</span>
+            </div>
+          </div>
+          <div class="skill-panel glass rv">
+            <div class="sp-title">Programming &amp; Protocols</div>
+            <div class="skill-pills">
+              <span class="sk-pill">Python (GUI Development)</span>
+              <span class="sk-pill">Arduino</span>
+              <span class="sk-pill">Raspberry Pi</span>
+              <span class="sk-pill">CAN Bus Protocol</span>
+              <span class="sk-pill">AES-128 Encryption</span>
+              <span class="sk-pill">Linux Environment</span>
+            </div>
+          </div>
+          <div class="skill-panel glass rv">
+            <div class="sp-title">Hardware &amp; Power Systems</div>
+            <div class="skill-pills">
+              <span class="sk-pill">Powertrain Wiring</span>
+              <span class="sk-pill">BLDC Motor Circuits</span>
+              <span class="sk-pill">DC-DC Converters</span>
+              <span class="sk-pill">Marx Generator Design</span>
+              <span class="sk-pill">AM / PM Modulation</span>
+              <span class="sk-pill">Smart Meter Systems</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects">
+        <div class="sec-head rv">
+          <span class="sec-label">What I've Built</span>
+          <h2 class="sec-title">Project Experience</h2>
+          <div class="sec-line"></div>
+        </div>
+        <div class="proj-grid">
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">♿</div>
+            <div class="proj-title">AI-Assisted Voice-Controlled Smart Wheelchair</div>
+            <p class="proj-desc">On the Power-Train team, wired power circuits for a BLDC motor using a battery pack for direct connection and a DC-DC converter for the Raspberry Pi control circuit — enhancing mobility for leprosy patients.</p>
+            <div class="proj-tags"><span class="pt">BLDC Motor</span><span class="pt">Raspberry Pi</span><span class="pt">DC-DC Converter</span><span class="pt">Powertrain</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">🔒</div>
+            <div class="proj-title">Symmetric Encryption for Secure Vehicular ECU Communication</div>
+            <p class="proj-desc">Developed "CANoe" — a Python GUI tool for sniffing and reverse-engineering automotive CAN frames. Implemented AES-128 in a Linux environment to guard against message injection and replay attacks on automotive networks.</p>
+            <div class="proj-tags"><span class="pt">Python</span><span class="pt">AES-128</span><span class="pt">CAN Bus</span><span class="pt">Automotive Security</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">⚡</div>
+            <div class="proj-title">Lightning Effects on BER &amp; SNR of AM / PM Systems</div>
+            <p class="proj-desc">Built Simulink simulations of AM and PM transmitter/receiver systems, injected a standard lightning impulse, and analysed the resulting effects on Bit Error Rate and Signal-to-Noise Ratio across both modulation methods.</p>
+            <div class="proj-tags"><span class="pt">MATLAB</span><span class="pt">Simulink</span><span class="pt">AM / PM</span><span class="pt">Signal Processing</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">🌩️</div>
+            <div class="proj-title">Simulation of a 10-Stage Marx Generator</div>
+            <p class="proj-desc">Constructed and simulated a 10-stage Marx Generator in MATLAB, configuring front-end and tail-end resistors to generate a standard lightning impulse waveform conforming to IEC specifications.</p>
+            <div class="proj-tags"><span class="pt">MATLAB</span><span class="pt">High Voltage</span><span class="pt">Marx Generator</span><span class="pt">Lightning Impulse</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">⚙️</div>
+            <div class="proj-title">GUI for Time-of-Use Tariffs &amp; Demand Side Management</div>
+            <p class="proj-desc">Built a MATLAB GUI that ingests Smart Meter data to calculate Time-of-Use tariffs and recommend optimised load-shifting strategies — helping consumers reduce costs during peak-demand windows.</p>
+            <div class="proj-tags"><span class="pt">MATLAB GUI</span><span class="pt">Smart Meters</span><span class="pt">DSM</span><span class="pt">Energy Systems</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+          <div class="proj-card glass rv">
+            <div class="proj-ico-w">🗑️</div>
+            <div class="patent-badge">🏛️ Patent Filed &amp; Under Processing</div>
+            <div class="proj-title">Design Patent: Smart Waste-Sorting Dustbin</div>
+            <p class="proj-desc">Co-invented the ornamental design of a waste-sorting dustbin: rectangular body with softened edges, a hinged top-lid, side ornamental supports with figurative elements, a front display with microphone opening, and a visible internal blade system.</p>
+            <div class="proj-tags"><span class="pt">Design Patent</span><span class="pt">IoT</span><span class="pt">Mechanical Design</span></div>
+            <a href="#" class="proj-link">View Details →</a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- CERTIFICATIONS -->
+      <section id="certs">
+        <div class="sec-head rv">
+          <span class="sec-label">Recognition</span>
+          <h2 class="sec-title">Certifications</h2>
+          <div class="sec-line"></div>
+        </div>
+        <div class="cert-grid">
+          <div class="cert-card glass rv">
+            <div class="cert-ico">🤖</div>
+            <div>
+              <div class="cert-name">Course on Automation and Data Sciences</div>
+              <div class="cert-from">Christ University &amp; NSP Global</div>
+            </div>
+          </div>
+          <div class="cert-card glass rv">
+            <div class="cert-ico">🏎️</div>
+            <div>
+              <div class="cert-name">Line Following Robot — Engineer's Day Exhibition</div>
+              <div class="cert-from">Christ University</div>
+            </div>
+          </div>
+          <div class="cert-card glass rv">
+            <div class="cert-ico">📊</div>
+            <div>
+              <div class="cert-name">MATLAB / Simulink Bible Course</div>
+              <div class="cert-from">Udemy</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <div class="sec-head rv">
+          <span class="sec-label">Say Hello</span>
+          <h2 class="sec-title">Get In Touch</h2>
+          <div class="sec-line"></div>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-fc glass rv">
+            <p>Looking for internship opportunities and happy to discuss engineering projects, collaborations, or just swap ideas about circuits and code. My inbox is always open.</p>
+            <form class="cform" onsubmit="handleSend(event)">
+              <div class="frow">
+                <div class="fg"><label for="nm">Name</label><input id="nm" type="text" placeholder="Your name" required></div>
+                <div class="fg"><label for="em">Email</label><input id="em" type="email" placeholder="you@email.com" required></div>
+              </div>
+              <div class="fg"><label for="su">Subject</label><input id="su" type="text" placeholder="What's this about?"></div>
+              <div class="fg"><label for="ms">Message</label><textarea id="ms" rows="5" placeholder="Your message..." required></textarea></div>
+              <button type="submit" class="btn-glow" style="align-self:flex-start;">Send Message ✉️</button>
+            </form>
+          </div>
+
+          <div class="contact-ic glass rv">
+            <div>
+              <div class="ci-title">Direct Contact</div>
+              <div class="ci-items">
+                <a href="tel:+918310544316" class="ci-item"><span class="ci-ico">📞</span> +91 8310544316</a>
+                <a href="mailto:tejas@email.com" class="ci-item"><span class="ci-ico">✉️</span> tejas@email.com</a>
+                <div class="ci-item"><span class="ci-ico">📍</span> Bengaluru, Karnataka</div>
+              </div>
+            </div>
+            <div>
+              <div class="ci-title">Online</div>
+              <div class="ci-items">
+                <a href="https://linkedin.com" target="_blank" rel="noopener" class="ci-item"><span class="ci-ico">💼</span> LinkedIn</a>
+                <a href="https://github.com" target="_blank" rel="noopener" class="ci-item"><span class="ci-ico">💻</span> GitHub</a>
+                <a href="#" class="ci-item"><span class="ci-ico">📄</span> Download Resume</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    const rvEls = document.querySelectorAll('.rv');
+    const rvObs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) setTimeout(() => e.target.classList.add('on'), i * 80);
+      });
+    }, { threshold: 0.07 });
+    rvEls.forEach(el => rvObs.observe(el));
+
+    const secs  = document.querySelectorAll('section');
+    const sLnks = document.querySelectorAll('.sb-link');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      secs.forEach(s => { if (window.scrollY >= s.offsetTop - 180) cur = s.id; });
+      sLnks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    }, { passive: true });
+
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+    sidebar.querySelectorAll('.sb-link').forEach(a => a.addEventListener('click', () => {
+      if (window.innerWidth < 900) sidebar.classList.remove('open');
+    }));
+
+    function handleSend(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.textContent = 'Sent! 🎉';
+      btn.style.background = 'linear-gradient(180deg, #00e5c8, #00bfa0)';
+      btn.disabled = true;
+      setTimeout(() => { btn.textContent = 'Send Message ✉️'; btn.style.background = ''; btn.disabled = false; e.target.reset(); }, 3500);
+    }
+  </script>
+</body>
+</html>
