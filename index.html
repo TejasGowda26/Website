@@ -752,15 +752,36 @@
         <div class="contact-grid">
           <div class="contact-fc glass rv">
             <p>Looking for internship opportunities and happy to discuss engineering projects, collaborations, or just swap ideas about circuits and code. My inbox is always open.</p>
-            <form class="cform" onsubmit="handleSend(event)">
-              <div class="frow">
-                <div class="fg"><label for="nm">Name</label><input id="nm" type="text" placeholder="Your name" required></div>
-                <div class="fg"><label for="em">Email</label><input id="em" type="email" placeholder="you@email.com" required></div>
-              </div>
-              <div class="fg"><label for="su">Subject</label><input id="su" type="text" placeholder="What's this about?"></div>
-              <div class="fg"><label for="ms">Message</label><textarea id="ms" rows="5" placeholder="Your message..." required></textarea></div>
-              <button type="submit" class="btn-glow" style="align-self:flex-start;">Send Message ✉️</button>
-            </form>
+           <form class="cform" action="https://formspree.io/f/meedoddb" method="POST">
+             <input type="hidden" name="_subject" value="Portfolio Contact Form">
+
+  <div class="frow">
+    <div class="fg">
+      <label for="nm">Name</label>
+      <input id="nm" name="name" type="text" placeholder="Your name" required>
+    </div>
+
+    <div class="fg">
+      <label for="em">Email</label>
+      <input id="em" name="email" type="email" placeholder="you@email.com" required>
+    </div>
+  </div>
+
+  <div class="fg">
+    <label for="su">Subject</label>
+    <input id="su" name="subject" type="text" placeholder="What's this about?">
+  </div>
+
+  <div class="fg">
+    <label for="ms">Message</label>
+    <textarea id="ms" name="message" rows="5" placeholder="Your message..." required></textarea>
+  </div>
+
+  <button type="submit" class="btn-glow" style="align-self:flex-start;">
+    Send Message ✉️
+  </button>
+
+</form>
           </div>
 
           <div class="contact-ic glass rv">
@@ -809,14 +830,6 @@
       if (window.innerWidth < 900) sidebar.classList.remove('open');
     }));
 
-    function handleSend(e) {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      btn.textContent = 'Sent! 🎉';
-      btn.style.background = 'linear-gradient(180deg, #00e5c8, #00bfa0)';
-      btn.disabled = true;
-      setTimeout(() => { btn.textContent = 'Send Message ✉️'; btn.style.background = ''; btn.disabled = false; e.target.reset(); }, 3500);
-    }
   </script>
 </body>
 </html>
