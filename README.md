@@ -20,7 +20,7 @@ GitHub Pages can serve this folder exactly as it is.
 | `js/kit.js` | Shared helpers, plus `LAYOUT`: the numbers that say where the big pieces sit |
 | `js/main.js` | Camera movement, clicking, the side panel, the list view, reflections and visual effects |
 | `js/demo.js` | The small traffic-jam game on the monitor |
-| `js/sky.js` | The sky colours, which follow the visitor's clock |
+| `js/sky.js` | The purple evening sky colours (`EVENING`) |
 | `vendor/` | Three.js, the library that draws 3D in the browser (do not edit) |
 | `resume.pdf` | The file behind every "Download resume" button |
 
@@ -47,7 +47,6 @@ Then open http://localhost:8000 in your browser. Press Ctrl+C to stop it.
 
 Handy address tricks while testing:
 
-- `?hour=18.5` shows the window at 6:30 pm (any hour from 0 to 24)
 - `?simple` opens the plain list view
 - `?quality=low` or `?quality=high` forces the lighter or fuller graphics
 - `#tja`, `#mpc`, `#can`, `#patent` and so on jump straight to an object
@@ -65,9 +64,11 @@ clicking, labels and side panel will keep working.
 - With no WebGL (very old devices), the site shows the plain list view instead.
 - On slow devices it automatically turns off the glow and ambient-occlusion
   effects and draws at a lower resolution, to stay smooth.
-- Lighting: the softbox is the main light, the window adds daylight or
-  moonlight, and the lamps and shelf strips add warmth. Brightness numbers are
-  in `js/furniture.js` (search for `Light(`).
+- Lighting: it is always a purple evening outside. The softbox is the main
+  light, the window adds soft lavender sky light, the lamps and shelf strips
+  add warmth, and three soft "bounce" lights fake light reflecting off the
+  floor and the wood panel. Brightness numbers are in `js/furniture.js`
+  (search for `Light(`); the sky colours are `EVENING` in `js/sky.js`.
 - To move the camera's resting position, change `VIEW` in `js/main.js`.
 - The driving demo is a simplified toy inspired by the Traffic Jam Assist
   project. It is not the Simulink model.

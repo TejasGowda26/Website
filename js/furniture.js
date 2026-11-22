@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { EVENING } from './sky.js';
 import { ACCENT, FONT, LAYOUT, mat, metal, glow, glass, shadow, box, rbox, cyl, ball, torus, at, rot, tube, rod, leaf, makeCanvas, canvasTexture, seededRandom } from './kit.js';
 
 RectAreaLightUniformsLib.init();       // needed once so soft "area" lights work
@@ -150,8 +151,8 @@ export function buildFurniture(scene) {
   shapeCurtains(0);
   out.ticks.push((t, dt) => { curtainClock += dt; if (curtainClock > 0.05) { curtainClock = 0; shapeCurtains(t); } });
 
-  // ---- light from outside: a soft glow from the whole window, plus a beam that
-  //      throws the window's shape (and its frame's shadow) across the floor ----------------------------
+  // ---- light from outside: a soft glow from the whole window, plus a soft beam that
+  //      throws the window's shape (and its frame's shadow) across the floor. Colours are set further down. ------
   const windowGlow = new THREE.RectAreaLight('#ffffff', 4, WIN.w, WIN.h);
   windowGlow.position.set(WIN.x, WIN.y, 0.08); windowGlow.lookAt(WIN.x, WIN.y, 5); add(windowGlow);
   const sun = new THREE.SpotLight('#ffffff', 400, 34, 0.3, 0.35, 1.1);
@@ -163,7 +164,7 @@ export function buildFurniture(scene) {
   const panelW = 3.9, panelH = 3.8;
   add(at(box(panelW, panelH, 0.04, mat('#22170f', { roughness: 0.8 })), PX, panelH / 2, 0.02));
   const nSlats = 34, pitch = panelW / nSlats;
-  const slats = new THREE.InstancedMesh(new THREE.BoxGeometry(pitch * 0.62, panelH, 0.05), mat('#ffffff', { roughness: 0.5, envMapIntensity: 0.7 }), nSlats);
+  const slats = new THREE.InstancedMesh(new THREE.BoxGeometry(pitch * 0.62, panelH, 0.05), mat('#ffffff', { roughness: 0.5, envMapIntensity: 0.45 }), nSlats);
   const m4 = new THREE.Matrix4(), tint = new THREE.Color();
   for (let i = 0; i < nSlats; i++) {
     m4.setPosition(PX - panelW / 2 + pitch * (i + 0.5), panelH / 2, 0.065); slats.setMatrixAt(i, m4);
@@ -248,53 +249,123 @@ export function buildFurniture(scene) {
     for (let i = 0; i < 5; i++) {
       const a = (i / 5) * Math.PI * 2 + 0.3;
       const spoke = rbox(0.32, 0.035, 0.05, blk, 0.012); spoke.position.set(Math.cos(a) * 0.16, 0.085, Math.sin(a) * 0.16); spoke.rotation.y = -a; g.add(spoke);
-      g.add(at(ball(0.035, mat('#0c0d10', { roughness: 0.6 }), 12), Math.cos(a) * 0.31, 0.035, Math.sin(a) * 0.31));
+      // caster: a swivel fork holding two small wheels
+      const cx = Math.cos(a) * 0.31, cz = Math.sin(a) * 0.31;
+      g.add(at(cyl(0.012, 0.012, 0.03, blk, 10), cx, 0.075, cz));
+      const fork = new THREE.Group(); fork.position.set(cx, 0.033, cz); fork.rotation.y = -a + 0.6; g.add(fork);
+      fork.add(at(rbox(0.05, 0.03, 0.03, blk, 0.008), 0, 0.022, 0));
+      for (const s of [-1, 1]) fork.add(rot(at(cyl(0.026, 0.026, 0.014, mat('#0c0d10', { roughness: 0.55 }), 16), 0, 0, s * 0.012), Math.PI / 2, 0, 0));
     }
     g.add(at(cyl(0.045, 0.05, 0.12, blk, 16), 0, 0.14, 0));
     g.add(at(cyl(0.026, 0.026, 0.26, metal('#c2c6cd', 0.25), 16), 0, 0.31, 0));
     g.add(at(rbox(0.24, 0.05, 0.24, blk, 0.012), 0, 0.445, 0));
     g.add(at(rbox(0.52, 0.1, 0.5, fabric, 0.045), 0, 0.52, 0));                    // seat
+    g.add(at(rbox(0.5, 0.012, 0.48, mat('#6f675d', { roughness: 0.95 }), 0.006), 0, 0.572, 0));   // seat piping
+    g.add(at(rbox(0.3, 0.035, 0.3, blk, 0.01), 0, 0.46, 0.0));                     // tilt mechanism
+    g.add(rot(at(rbox(0.16, 0.012, 0.02, blk, 0.005), 0.2, 0.46, -0.05), 0, 0.25, -0.15));      // height lever
+    g.add(at(ball(0.014, blk, 8), 0.28, 0.45, -0.07));
     const back = new THREE.Group(); back.position.set(0, 0.56, 0.25); back.rotation.x = 0.13; g.add(back);
     back.add(at(rbox(0.07, 0.36, 0.035, blk, 0.012), 0, 0.14, 0.04));                // spine
     back.add(at(rbox(0.48, 0.5, 0.075, fabric, 0.045), 0, 0.42, 0));                 // backrest
     back.add(at(rbox(0.36, 0.1, 0.085, fabric, 0.04), 0, 0.22, -0.01));              // lumbar pad
+    for (const y of [0.3, 0.42, 0.54]) back.add(at(box(0.4, 0.006, 0.004, mat('#6f675d', { roughness: 0.95 })), 0, y, -0.039));   // stitched channels
+    back.add(at(rbox(0.05, 0.16, 0.03, blk, 0.01), 0, 0.74, 0.035));               // headrest post
+    back.add(at(rbox(0.3, 0.12, 0.07, fabric, 0.035), 0, 0.82, 0.0));              // headrest
     for (const sx of [-1, 1]) {
       g.add(at(rbox(0.035, 0.2, 0.04, blk, 0.01), sx * 0.3, 0.63, 0.04));
       g.add(at(rbox(0.07, 0.03, 0.27, mat('#1e2026', { roughness: 0.7 }), 0.012), sx * 0.3, 0.74, 0.0));
     }
   }
 
-  // ---- studio softbox on a stand: the main ("key") light of the room ------------------------------------------------
+  // ---- studio softbox on a light stand: the main ("key") light of the room ---------------------------------------
+  //      All three tripod legs point forwards or sideways, so none of them pass through a wall.
+  const socket = [WALL_RIGHT - 0.55, 0.3];          // wall socket (x, y) both right-hand lamps plug into
   {
-    const base = [WALL_RIGHT - 0.98, 0, 0.42], headPos = new THREE.Vector3(base[0] - 0.12, 3.0, base[2] + 0.36);
+    const base = new THREE.Vector3(4.5, 0, 0.62);
+    const headPos = new THREE.Vector3(base.x - 0.1, 3.0, base.z + 0.34);
     const aim = new THREE.Vector3(PX - 0.1, 1.05, 0.7);
     const blk = mat('#121317', { roughness: 0.5, metalness: 0.4 });
-    for (let i = 0; i < 3; i++) { const a = (i / 3) * Math.PI * 2 + 0.5; add(rod([base[0], 0.62, base[2]], [base[0] + Math.cos(a) * 0.5, 0.02, base[2] + Math.sin(a) * 0.5], 0.012, blk)); }
-    add(rod([base[0], 0.3, base[2]], [base[0], 2.92, base[2]], 0.014, blk));
-    add(rod([base[0], 2.92, base[2]], [headPos.x, headPos.y, headPos.z - 0.2], 0.014, blk));
-    add(at(cyl(0.022, 0.022, 0.06, blk, 12), base[0], 1.5, base[2]));
-    const head = new THREE.Group(); head.position.copy(headPos); head.lookAt(aim); add(head);       // +z of the head points at the desk
-    const hood = shadow(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.52, 0.42, 4, 1, true), mat('#0e0f12', { roughness: 0.7, side: THREE.DoubleSide })));
+    const alu = metal('#a3a9b3', 0.32);
+    const rubber = mat('#1b1c21', { roughness: 0.85 });
+    const P = (v) => [v.x, v.y, v.z];
+    const hubY = 0.62, braceY = 0.3;
+    const feet = [];
+    for (let i = 0; i < 3; i++) {
+      const a = Math.PI / 2 + (i / 3) * Math.PI * 2;             // front, back-left, back-right
+      const dir = new THREE.Vector3(Math.cos(a), 0, Math.sin(a));
+      const top = base.clone().addScaledVector(dir, 0.03).setY(hubY);
+      const foot = base.clone().addScaledVector(dir, 0.48).setY(0.025);
+      feet.push(foot);
+      add(rod(P(top), P(foot), 0.011, blk));                                         // leg
+      add(rod([base.x, braceY, base.z], P(top.clone().lerp(foot, 0.5)), 0.006, blk));  // brace back to the pole
+      add(at(cyl(0.017, 0.021, 0.025, rubber, 12), foot.x, 0.0125, foot.z));            // rubber foot
+    }
+    add(at(cyl(0.034, 0.034, 0.075, blk, 16), base.x, hubY, base.z));                  // leg hub
+    add(at(cyl(0.028, 0.028, 0.045, blk, 16), base.x, braceY, base.z));                // sliding brace collar
+    // a sandbag over the front leg keeps it steady
+    const bag = rbox(0.2, 0.06, 0.13, mat('#3b3a35', { roughness: 0.95 }), 0.028);
+    bag.position.copy(base.clone().lerp(feet[0], 0.84)).setY(0.115); bag.rotation.y = Math.PI / 2; add(bag);
+    add(at(box(0.012, 0.03, 0.14, mat('#54524a', { roughness: 0.9 })), bag.position.x, 0.15, bag.position.z));
+    // telescoping pole: three sections, thinner as they go up, with a locking knob at each joint
+    for (const [y0, y1, r, m] of [[0.25, 1.36, 0.019, blk], [1.36, 2.26, 0.015, alu], [2.26, 2.96, 0.012, alu]]) add(rod([base.x, y0, base.z], [base.x, y1, base.z], r, m));
+    for (const y of [1.36, 2.26]) {
+      add(at(cyl(0.025, 0.025, 0.065, blk, 16), base.x, y, base.z));
+      add(rod([base.x + 0.02, y, base.z], [base.x + 0.06, y, base.z], 0.005, blk));
+      add(rot(at(cyl(0.017, 0.017, 0.016, rubber, 12), base.x + 0.068, y, base.z), 0, 0, Math.PI / 2));
+    }
+    // tilt bracket at the top, with its own knob
+    add(rod([base.x, 2.96, base.z], [headPos.x, headPos.y - 0.13, headPos.z - 0.14], 0.012, alu));
+    add(at(ball(0.026, blk, 12), headPos.x, headPos.y - 0.13, headPos.z - 0.14));
+    const head = new THREE.Group(); head.position.copy(headPos); head.lookAt(aim); add(head);   // +z of the head points at the desk
+    // fabric hood (black outside, silver inside), a white diffuser with a stitched black border
+    const hoodGeo = new THREE.CylinderGeometry(0.1, 0.52, 0.42, 4, 1, true);
+    const hood = shadow(new THREE.Mesh(hoodGeo, mat('#0e0f12', { roughness: 0.85, side: THREE.FrontSide })));
     hood.rotation.set(-Math.PI / 2, Math.PI / 4, 0); hood.position.z = -0.02; head.add(hood);
-    head.add(at(new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.72), glow(2.0, 1.82, 1.55)), 0, 0, 0.19));
-    head.add(at(box(0.76, 0.76, 0.012, blk), 0, 0, 0.18));
-    head.add(at(cyl(0.05, 0.05, 0.18, blk, 12), 0, 0, -0.3).rotateX(Math.PI / 2));
+    const lining = new THREE.Mesh(hoodGeo, mat('#c9ccd2', { roughness: 0.35, metalness: 0.6, side: THREE.BackSide }));
+    lining.rotation.copy(hood.rotation); lining.position.copy(hood.position); lining.scale.setScalar(0.995); head.add(lining);
+    head.add(at(new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), glow(2.0, 1.82, 1.55)), 0, 0, 0.195));
+    for (const [w, h, x, y] of [[0.76, 0.035, 0, 0.36], [0.76, 0.035, 0, -0.36], [0.035, 0.76, 0.36, 0], [0.035, 0.76, -0.36, 0]]) head.add(at(box(w, h, 0.02, blk), x, y, 0.19));
+    for (const [x, y] of [[-0.35, 0.35], [0.35, 0.35], [-0.35, -0.35], [0.35, -0.35]]) head.add(at(ball(0.014, alu, 8), x, y, 0.2));       // rod-end pockets
+    // speed ring, lamp body with cooling fins, power switch
+    head.add(at(rbox(0.2, 0.2, 0.03, alu, 0.01), 0, 0, -0.235));
+    head.add(rot(at(cyl(0.062, 0.062, 0.16, blk, 20), 0, 0, -0.33), Math.PI / 2, 0, 0));
+    for (let i = 0; i < 6; i++) head.add(rot(at(cyl(0.072, 0.072, 0.008, blk, 20), 0, 0, -0.27 - i * 0.022), Math.PI / 2, 0, 0));
+    head.add(at(rbox(0.05, 0.03, 0.04, blk, 0.006), 0, 0.075, -0.35));
+    head.add(at(box(0.012, 0.012, 0.004, glow(0.4, 2.6, 1.2)), 0.012, 0.091, -0.345));
+    // power cable: from the lamp body down the pole, along the floor to the wall socket
+    head.updateMatrixWorld(true);
+    const tail = new THREE.Vector3(0, -0.04, -0.42).applyMatrix4(head.matrixWorld);
+    add(tube([P(tail), [base.x + 0.05, 2.75, base.z + 0.02], [base.x + 0.024, 2.2, base.z + 0.02], [base.x + 0.026, 1.0, base.z + 0.022], [base.x + 0.03, 0.35, base.z + 0.02],
+      [base.x + 0.18, 0.012, base.z - 0.05], [socket[0] - 0.1, 0.012, 0.12], [socket[0], socket[1] - 0.06, 0.03]], 0.006, mat('#0c0d10', { roughness: 0.6 }), 60));
     const soft = new THREE.RectAreaLight('#ffe9d2', 5.5, 0.9, 0.9);
     soft.position.copy(headPos).add(aim.clone().sub(headPos).normalize().multiplyScalar(0.25)); soft.lookAt(aim); add(soft);
     const key = new THREE.SpotLight('#ffe6cc', 70, 15, 0.72, 0.85, 1.5);
     key.position.set(PX + 3.1, 3.3, 3.4); key.target.position.copy(aim);    // further forward than the lamp, for nicer shadows
     key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0005; key.shadow.radius = 7; key.shadow.camera.near = 0.6; key.shadow.camera.far = 14;
     add(key); add(key.target);
+    out.key = key; out.soft = soft;
   }
 
   // ---- floor lamp with a glowing globe (right corner) -------------------------------------------------------------------
   {
     const x = WALL_RIGHT - 0.75, z = 0.75;
-    const brassy = metal('#b08a52', 0.3);
-    add(at(cyl(0.17, 0.18, 0.025, brassy, 28), x, 0.0125, z));
-    add(rod([x, 0.02, z], [x, 1.62, z], 0.012, brassy));
-    add(at(new THREE.Mesh(new THREE.SphereGeometry(0.2, 28, 20), glow(2.3, 1.75, 1.15)), x, 1.82, z));
-    add(at(cyl(0.05, 0.06, 0.05, brassy, 16), x, 1.63, z));
+    const brassy = metal('#b08a52', 0.3), dark = mat('#17181c', { roughness: 0.4, metalness: 0.5 });
+    add(at(cyl(0.17, 0.185, 0.03, dark, 36), x, 0.015, z));                         // weighted base
+    add(rot(at(torus(0.17, 0.006, brassy, 36), x, 0.03, z), Math.PI / 2, 0, 0));      // brass trim ring
+    add(at(cyl(0.035, 0.05, 0.05, brassy, 16), x, 0.055, z));
+    add(rod([x, 0.06, z], [x, 0.85, z], 0.012, brassy));
+    add(at(cyl(0.018, 0.018, 0.04, brassy, 14), x, 0.85, z));                        // joint between the two stem sections
+    add(rod([x, 0.85, z], [x, 1.6, z], 0.011, brassy));
+    add(at(cyl(0.06, 0.045, 0.035, brassy, 20), x, 1.615, z));                       // globe holder ("gallery")
+    add(rot(at(torus(0.05, 0.005, brassy, 20), x, 1.635, z), Math.PI / 2, 0, 0));
+    add(at(new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 22), glow(2.3, 1.75, 1.15)), x, 1.82, z));
+    add(at(cyl(0.012, 0.016, 0.02, brassy, 12), x, 2.02, z));                        // finial on top
+    // cord from the base, through a foot switch, to the wall socket
+    add(tube([[x + 0.02, 0.03, z - 0.17], [x + 0.06, 0.012, z - 0.35], [x + 0.12, 0.012, z - 0.5], [socket[0] + 0.05, 0.012, 0.1], [socket[0] + 0.03, socket[1] - 0.06, 0.03]], 0.0045, mat('#e9e4da', { roughness: 0.6 }), 40));
+    add(rot(at(rbox(0.07, 0.025, 0.04, mat('#e9e4da', { roughness: 0.5 }), 0.008), x + 0.08, 0.0125, z - 0.42), 0, 0.5, 0));
+    // the wall socket both lamps plug into
+    add(at(rbox(0.13, 0.09, 0.012, mat('#ece7de', { roughness: 0.45 }), 0.008), socket[0], socket[1], 0.006));
+    for (const dx of [-0.03, 0.03]) add(at(rbox(0.032, 0.04, 0.03, dx < 0 ? dark : mat('#e9e4da', { roughness: 0.5 }), 0.006), socket[0] + dx, socket[1], 0.025));
     const p = new THREE.PointLight('#ffc58a', 6.5, 7.5, 1.7); p.position.set(x - 0.05, 1.82, z + 0.1); add(p);
   }
 
@@ -305,6 +376,9 @@ export function buildFurniture(scene) {
     g.add(at(cyl(r, r * 0.8, h, mat(colour, { roughness: 0.55 }), 28), 0, h / 2, 0));
     g.add(rot(at(torus(r, r * 0.07, mat(colour, { roughness: 0.55 }), 28), 0, h, 0), Math.PI / 2, 0, 0));
     g.add(at(cyl(r * 0.93, r * 0.93, 0.01, mat('#2a1d14', { roughness: 1 }), 20), 0, h - 0.015, 0));
+    g.add(at(cyl(r * 1.02, r * 0.95, 0.02, mat(colour, { roughness: 0.5 }), 28), 0, 0.01, 0));       // saucer
+    const pebble = mat('#b9b2a6', { roughness: 0.9 });
+    for (let i = 0; i < 7; i++) { const a = i * 2.3, d = r * (0.35 + 0.45 * ((i * 37) % 10) / 10); const p = ball(r * 0.06, pebble, 8); p.scale.y = 0.6; g.add(at(p, Math.cos(a) * d, h - 0.008, Math.sin(a) * d)); }
     return g;
   };
   const sway = [];
@@ -399,22 +473,28 @@ export function buildFurniture(scene) {
     });
   }
 
-  // ---- the lights that change with the time of day -------------------------------------------------------------------------------
-  const moon = new THREE.Color('#8fa6ff'), dusk = new THREE.Color('#ff9a57'), noon = new THREE.Color('#fff3df'), c = new THREE.Color();
-  out.setTime = (s, hour) => {
-    const d = s.daylight;
-    if (d < 0.45) c.copy(moon).lerp(dusk, d / 0.45); else c.copy(dusk).lerp(noon, (d - 0.45) / 0.55);
-    sun.color.copy(c);
-    sun.intensity = d < 0.08 ? 70 : 170 + 190 * d;
-    const dir = new THREE.Vector3(0.72 + 0.12 * Math.sin(hour * 0.5), -(0.78 + 0.3 * d), 1).normalize();
-    const wc = new THREE.Vector3(WIN.x, WIN.y, -0.1);
+  // ---- evening light: purple sky light through the window, and light bouncing around the room -------------------------------
+  //      A real room is lit as much by light bouncing off its floor and walls as by the lamps themselves.
+  //      The soft "area" lights below fake that bounce: they glow up from the floor and out from the wood panel.
+  {
+    // sky light through the window: lavender and soft, with the window frame's shadow faintly on the floor
+    windowGlow.color.set(EVENING.window); windowGlow.intensity = 3.4;
+    sun.color.set('#c6a6e6'); sun.intensity = 60; sun.penumbra = 0.85; sun.angle = 0.42;
+    const dir = new THREE.Vector3(0.62, -0.62, 1).normalize(), wc = new THREE.Vector3(WIN.x, WIN.y, -0.1);
     sun.position.copy(wc).addScaledVector(dir, -9); sun.target.position.copy(wc).addScaledVector(dir, 5);
-    windowGlow.color.setRGB(s.low[0] / 255, s.low[1] / 255, s.low[2] / 255, THREE.SRGBColorSpace).lerp(noon, 0.25 + 0.4 * d);
-    windowGlow.intensity = 1.6 + 4.5 * d;
-    hemi.color.setRGB(s.mid[0] / 255, s.mid[1] / 255, s.mid[2] / 255, THREE.SRGBColorSpace).lerp(noon, 0.55);
-    hemi.intensity = 0.42 + 0.38 * d;
-    out.dustMat.opacity = 0.28 + 0.4 * d;
-  };
+    // whole-room fill: violet from above (the sky), warm wood colour from below (the floor)
+    hemi.color.set('#9884d4'); hemi.groundColor.set('#7a5034'); hemi.intensity = 0.55;
+    // bounce 1: the purple window light pooling on the floor and lifting the curtains, the plant and the wheel
+    const winBounce = new THREE.RectAreaLight(EVENING.bounce, 1.0, 2.4, 2.0);
+    winBounce.position.set(WIN.x + 0.4, 0.02, 1.3); winBounce.lookAt(WIN.x + 0.4, 3, 1.31); add(winBounce);
+    // bounce 2: the warm lamplight bouncing off the wooden floor onto the desk, chair and the lower walls
+    const floorBounce = new THREE.RectAreaLight('#f0a46e', 1.1, 4.4, 2.6);
+    floorBounce.position.set(PX + 0.8, 0.02, 1.7); floorBounce.lookAt(PX + 0.8, 3, 1.71); add(floorBounce);
+    // bounce 3: the shelf LEDs wash the slatted wood, which glows warm light back into the room
+    const panelBounce = new THREE.RectAreaLight('#ff9d5c', 0.7, 3.6, 2.4);
+    panelBounce.position.set(PX, 1.9, 0.13); panelBounce.lookAt(PX, 1.9, 4); add(panelBounce);
+    out.dustMat.color.set('#ecd8ff'); out.dustMat.opacity = 0.38;
+  }
 
   return out;
 }

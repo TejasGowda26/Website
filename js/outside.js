@@ -1,11 +1,11 @@
 // outside.js — the 3D city you see through the window: a sky far away, rows of
 // buildings at different distances, a metro line with a train, trees, drifting
 // clouds and a balcony railing. Because it is real 3D, it shifts as the camera
-// moves, like a real view. Colours follow the visitor's local time.
+// moves, like a real view. It is always a purple evening, just after sunset.
 
 import * as THREE from 'three';
 import { mat, box, cyl, ball, at, makeCanvas, canvasTexture, seededRandom, LAYOUT } from './kit.js';
-import { drawSky } from './sky.js';
+import { drawSky, EVENING } from './sky.js';
 
 const GROUND = -10;        // the room is a few floors up, so the street is below y = 0
 
@@ -37,7 +37,7 @@ export function buildOutside(scene) {
   const rnd = seededRandom(26);
 
   // ---- sky: a huge picture far behind everything ---------------------------------
-  const skyCanvas = makeCanvas(1024, 512);
+  const skyCanvas = makeCanvas(2048, 1024);
   const skyTex = canvasTexture(skyCanvas);
   const sky = new THREE.Mesh(new THREE.PlaneGeometry(240, 120), new THREE.MeshBasicMaterial({ map: skyTex, fog: false, toneMapped: false }));
   sky.position.set(WIN.x, 24, -75); g.add(sky);
@@ -130,18 +130,18 @@ export function buildOutside(scene) {
 
   g.traverse((o) => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
 
-  // ---- time of day ----------------------------------------------------------------------------------
-  const nightCol = new THREE.Color('#1a2030'), dayCol = new THREE.Color('#ffffff'), tmp = new THREE.Color();
-  function setTime(hour) {
-    const s = drawSky(skyCanvas, hour, { skyline: false, horizon: 0.72, sunX: [0.36, 0.5], sunRadius: 8, moonX: 0.43, moonY: 0.58, stars: 260 });
+  // ---- evening colours ------------------------------------------------------------------------------
+  // The window only sees a narrow band of the sky picture (about 0.39 to 0.48 across and 0.57 to 0.72 down),
+  // so the gradient, moon and stars are placed inside that band.
+  function setEvening() {
+    drawSky(skyCanvas, { horizon: 0.72, top: 0.5, glowX: 0.44, moonX: 0.415, moonY: 0.585, moonRadius: 9, venusX: 0.462, venusY: 0.61, stars: 700 });
     skyTex.needsUpdate = true;
-    const night = 1 - Math.min(1, s.daylight * 2.2);
-    for (const m of variants) { m.color.copy(tmp.copy(nightCol).lerp(dayCol, Math.min(1, s.daylight * 1.15))); m.emissiveIntensity = night * 1.05; }
-    trainWindows.emissiveIntensity = 0.15 + night * 1.6;
-    cloudMat.color.setRGB(s.mid[0] / 255, s.mid[1] / 255, s.mid[2] / 255, THREE.SRGBColorSpace).lerp(dayCol, 0.35 + 0.4 * s.daylight);
-    cloudMat.opacity = 0.25 + 0.5 * s.daylight;
-    plane.visible = night > 0.3;
-    return s;
+    for (const m of variants) { m.color.set('#a89cc8'); m.emissiveIntensity = 0.85; }      // lavender-lit walls, lights coming on
+    trainWindows.emissiveIntensity = 1.4;
+    cloudMat.color.set('#f4a6c6'); cloudMat.opacity = 0.5;                                  // clouds lit pink from below
+    for (const [i, m] of treeMats.entries()) m.color.set(['#2c4a3e', '#35554a', '#243f36'][i]);
+    plane.visible = true;
+    return { haze: EVENING.haze };
   }
 
   function tick(t, dt) {
@@ -152,5 +152,5 @@ export function buildOutside(scene) {
     plane.scale.setScalar(Math.sin(t * 5) > 0.6 ? 1 : 0.35);
   }
 
-  return { setTime, tick };
+  return { setEvening, tick };
 }
