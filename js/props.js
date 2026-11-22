@@ -11,6 +11,19 @@ import { ACCENT, FONT, LAYOUT, mat, metal, glow, glass, shadow, box, rbox, cyl, 
 const { PX, DESK_Y, WIN, SHELF_TOP, SHELF_LOW } = LAYOUT;
 
 // ---- pictures drawn with code (used on screens, the plaque and the photo) -------------
+
+// A book spine: the cover colour, a band near the top, the title running bottom to top.
+function drawSpine(c, title, colour) {
+  const g = c.getContext('2d');
+  g.fillStyle = colour; g.fillRect(0, 0, 64, 384);
+  const light = ['#e3ddd0', '#5ee0c8'].includes(colour);
+  const ink = light ? '#1d2027' : '#f4f1ea';
+  g.fillStyle = ink; g.globalAlpha = 0.85; g.fillRect(8, 26, 48, 5); g.fillRect(8, 36, 48, 2); g.fillRect(8, 342, 48, 2); g.globalAlpha = 1;
+  g.save(); g.translate(34, 322); g.rotate(-Math.PI / 2);
+  g.font = `600 25px ${FONT}`; g.fillStyle = ink; g.textBaseline = 'middle';
+  let size = 25; while (g.measureText(title).width > 270 && size > 14) { size--; g.font = `600 ${size}px ${FONT}`; }
+  g.fillText(title, 0, 0); g.restore();
+}
 function drawPipeline(c, progress) {
   const g = c.getContext('2d'), W = c.width, H = c.height;
   g.fillStyle = '#10141b'; g.fillRect(0, 0, W, H);
@@ -142,7 +155,7 @@ export function buildProps(scene, { demoCanvas, photoUrl }) {
     const gc = makeCanvas(256, 128), gx = gc.getContext('2d');
     const gr = gx.createRadialGradient(128, 64, 4, 128, 64, 128); gr.addColorStop(0, 'rgba(94,224,200,0.9)'); gr.addColorStop(0.5, 'rgba(110,120,255,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
     gx.fillStyle = gr; gx.fillRect(0, 0, 256, 128);
-    const halo = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 1.5), new THREE.MeshBasicMaterial({ map: canvasTexture(gc), transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(2.7, 1.5), new THREE.MeshBasicMaterial({ map: canvasTexture(gc), transparent: true, opacity: 0.34, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
     halo.position.set(PX, MY, 0.098); scene.add(halo);
 
     g.add(at(rbox(1.75, 0.58, 0.035, dark, 0.014), PX, MY, 0.42));
@@ -328,12 +341,14 @@ export function buildProps(scene, { demoCanvas, photoUrl }) {
   {
     const g = new THREE.Group(); g.position.set(PX + 0.72, topY, 0.28);
     const specs = [[0.06, 0.34, '#5ee0c8'], [0.05, 0.3, '#c98a3a'], [0.07, 0.38, '#8a6bd1'], [0.045, 0.31, '#e3ddd0'], [0.06, 0.35, '#d86a5a'], [0.05, 0.29, '#4f8fd8'], [0.055, 0.33, '#2f333d']];
+    const titles = ['Vehicle Dynamics', 'Control Systems', 'Electric Drives', 'Power Electronics', 'Embedded C', 'Signals & Systems', 'MATLAB & Simulink'];
     const books = []; let x = 0;
     for (const [w, h, col] of specs) {
       const b = rbox(w, h, 0.22, mat(col, { roughness: 0.7 }), 0.006); b.position.set(x + w / 2, h / 2, 0); g.add(b); books.push(b); x += w + 0.004;
-      b.add(at(box(w * 0.62, 0.022, 0.002, mat('#f2f4f8')), 0, h * 0.26, 0.111));
-      b.add(at(box(w * 0.62, 0.006, 0.002, mat('#f2f4f8')), 0, h * 0.26 - 0.022, 0.111));
-      b.add(at(box(w * 0.4, 0.04, 0.002, mat('#15171c')), 0, -h * 0.3, 0.111));
+      const sc = makeCanvas(64, 384), title = titles[books.length - 1], st = canvasTexture(sc);
+      const redraw = () => { drawSpine(sc, title, col); st.needsUpdate = true; }; redraw(); room.refreshers.push(redraw);   // again once the font loads
+      const spine = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.006, h - 0.008), mat('#ffffff', { map: st, roughness: 0.65 }));
+      spine.position.z = 0.1105; b.add(spine);
       b.add(at(box(w - 0.012, 0.004, 0.2, mat('#efe9db')), 0, h / 2 - 0.004, 0));                    // page edges on top
     }
     g.add(rot(at(rbox(0.05, 0.3, 0.22, mat('#1f6f8f', { roughness: 0.7 }), 0.006), x + 0.07, 0.145, 0), 0, 0, -0.3));

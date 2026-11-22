@@ -130,9 +130,7 @@ function start3D() {
   // ---- the monitor's driving demo and the room itself ------------------------------
   const demoCanvas = document.createElement('canvas'); demoCanvas.width = 1024; demoCanvas.height = 320;
   const demo = new TrafficDemo(demoCanvas);
-  const clockHour = () => { const d = new Date(); return d.getHours() + d.getMinutes() / 60; };
-  const fixedHour = params.has('hour') ? parseFloat(params.get('hour')) : null;   // e.g. ?hour=18.5 to preview dusk
-  const room = buildRoom(scene, { demoCanvas, hour: fixedHour ?? clockHour(), photoUrl: profile.photo });
+  const room = buildRoom(scene, { demoCanvas, photoUrl: profile.photo });
   const PX = room.LAYOUT.PX;             // centre line of the desk and monitor
 
   // ---- reflections: take a 360° snapshot of the room and let shiny things mirror it ----
@@ -141,15 +139,18 @@ function start3D() {
   const cubeCam = new THREE.CubeCamera(0.1, 90, cubeTarget); cubeCam.position.set(0.5, 1.5, 2.8);
   let envTarget = null;
   scene.environmentIntensity = 0.6;
+  // The room has no front wall or ceiling, so while taking the snapshot the empty space
+  // around it is painted a dim warm wall colour instead of the purple sky haze.
+  const snapshotBackdrop = new THREE.Color('#3b2c26');
   function refreshReflections() {
+    const bg = scene.background; scene.background = snapshotBackdrop;
     cubeCam.update(renderer, scene);
+    scene.background = bg;
     const fresh = pmrem.fromCubemap(cubeTarget.texture);
     scene.environment = fresh.texture;
     envTarget?.dispose(); envTarget = fresh;
   }
-  const applyDaylight = () => { renderer.toneMappingExposure = 1.0 + 0.08 * room.daylight; };
-  applyDaylight();
-  if (fixedHour == null) setInterval(() => { room.setHour(clockHour()); applyDaylight(); refreshReflections(); }, 60000);
+  renderer.toneMappingExposure = 1.06;
   document.fonts?.ready.then(() => room.refreshers.forEach((f) => f()));
 
   // ---- soft glow around bright things ("bloom"); skipped quietly if it fails to load ----
@@ -178,7 +179,7 @@ function start3D() {
 
   const touch = matchMedia('(pointer: coarse)').matches;
   if (touch) {
-    $('#hint').textContent = 'Tap an object to open it. Drag to look around.';
+    $('#coachText').innerHTML = '<b>Tap the glowing dots.</b> Every object opens one of my projects. Drag to look around.';
     $('#hudText').textContent = 'Hold the arrow buttons to steer. Keep the green car in its lane.';
   }
 
@@ -247,13 +248,42 @@ function start3D() {
     hotspotsEl.append(b); hotspots[id] = b;
   }
 
+  // ---- the "click the objects" prompt ------------------------------------------------------
+  // Until the visitor opens their first object, the labels pop up one after another
+  // so it is obvious that the dots (and the objects under them) can be clicked.
+  const coach = $('#coach');
+  let explored = false, sweepI = 0;
+  const peekOrder = tourOrder.filter((id) => hotspots[id]);
+  function sweepLabels() {
+    for (const id of peekOrder) hotspots[id].classList.remove('peek');
+    if (explored || mode !== 'room') return;
+    for (let tries = 0; tries < peekOrder.length; tries++) {          // skip dots that are off screen
+      const b = hotspots[peekOrder[sweepI++ % peekOrder.length]];
+      const r = b.getBoundingClientRect();
+      if (r.left > 0 && r.right < W && r.top > 60 && r.bottom < H) { b.classList.add('peek'); break; }
+    }
+  }
+  const sweepTimer = reduceMotion ? null : setInterval(sweepLabels, 1500);
+  function markExplored() {
+    if (explored) return;
+    explored = true; coach.classList.add('done'); clearInterval(sweepTimer); sweepLabels();
+  }
+
   // ---- side panel ----------------------------------------------------------------------
   const panel = $('#panel'), panelBody = $('#panelBody');
   function fillPanel(id) {
     const it = byId[id];
     panelBody.replaceChildren(...itemBody(it, 'h2'));
     const actions = [];
-    if (it.drive) actions.push(el('button', { class: 'pill solid big', type: 'button', onclick: enterDrive }, 'Take the wheel'));
+    if (it.drive) {
+      // the playable demo goes right under the title, where nobody can miss it
+      const icon = document.createElement('span'); icon.setAttribute('aria-hidden', 'true');
+      icon.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.2"/><path d="M3.5 10.5h6.3M14.2 10.5h6.3M12 14.2V21"/></svg>';
+      const callout = el('div', { class: 'drive-callout' },
+        el('button', { class: 'pill solid big drive-btn', type: 'button', onclick: enterDrive }, icon, 'Take the wheel'),
+        el('p', {}, 'A playable version of this project: steer the car and keep it in its lane, right here in your browser.'));
+      panelBody.insertBefore(callout, panelBody.children[2] ?? null);
+    }
     if (it.resume) {
       actions.push(el('a', { class: 'pill solid big', href: profile.resumePdf, download: true }, 'Download resume (PDF)'));
       actions.push(el('button', { class: 'pill big', type: 'button', onclick: () => openList('about') }, 'Read it as a plain page'));
@@ -273,7 +303,7 @@ function start3D() {
     if (mode === 'drive') exitDrive(true);
     const fresh = mode !== 'focus';
     mode = 'focus'; focusId = id; hoverId = null;
-    document.body.classList.add('focused');
+    document.body.classList.add('focused'); markExplored();
     fillPanel(id);
     panel.hidden = false;
     if (fresh) { panel.style.animation = 'none'; void panel.offsetWidth; panel.style.animation = ''; $('#panelClose').focus({ preventScroll: true }); }
